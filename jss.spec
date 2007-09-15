@@ -2,7 +2,7 @@
 %define major		3
 %define minor		4
 %define version		%{major}.%{minor}
-%define release		%mkrel 7
+%define release		%mkrel 8
 %define	section		free
 %define build_free	1
 %define gcj_support	1
@@ -24,8 +24,6 @@ BuildRequires:	libnss-devel
 BuildRequires:	nsinstall
 %if %{gcj_support}
 BuildRequires:    java-gcj-compat-devel
-Requires(post):   java-gcj-compat
-Requires(postun): java-gcj-compat
 %endif
 BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
 
