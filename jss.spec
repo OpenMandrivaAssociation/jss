@@ -2,7 +2,7 @@
 %define major		3
 %define minor		4
 %define version		%{major}.%{minor}
-%define release		%mkrel 8
+%define release		%mkrel 9
 %define	section		free
 %define build_free	1
 %define gcj_support	1
@@ -18,7 +18,7 @@ URL:		http://www.mozilla.org/projects/security/pki/jss/
 Source0:	ftp://ftp.mozilla.org/pub/mozilla.org/security/jss/releases/JSS_3_4_RTM/src/jss-3.4-src.tar.bz2
 Patch0:		jss-3.4-nss-3.11.4.patch
 BuildRequires:  java-devel
-BuildRequires:  jpackage-utils >= 0:1.5
+BuildRequires:  java-rpmbuild >= 0:1.5
 # For mozilla-firefox-nss.pc
 BuildRequires:	libnss-devel
 BuildRequires:	nsinstall
