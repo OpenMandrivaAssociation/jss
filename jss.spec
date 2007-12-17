@@ -25,7 +25,6 @@ BuildRequires:	nsinstall
 %if %{gcj_support}
 BuildRequires:    java-gcj-compat-devel
 %endif
-BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
 
 %description
 Network Security Services for Java (JSS) is a Java interface to NSS. It 
