@@ -1,31 +1,28 @@
-%define name		jss
-%define major		3
-%define minor		4
-%define version		%{major}.%{minor}
-%define release		%mkrel 9
-%define	section		free
-%define build_free	1
-%define gcj_support	1
+%define major                3
+%define minor                4
+%define        section                free
+%define build_free        1
+%define gcj_support        1
 
-Name:		%{name}
-Summary:	Network Security Services for Java (JSS)
-Version:	%{version}
-Release:	%{release}
-Epoch:		0
-License:	GPL
-Group:		Development/Java
-URL:		http://www.mozilla.org/projects/security/pki/jss/
-Source0:	ftp://ftp.mozilla.org/pub/mozilla.org/security/jss/releases/JSS_3_4_RTM/src/jss-3.4-src.tar.bz2
-Patch0:		jss-3.4-nss-3.11.4.patch
+Name:                jss
+Summary:        Network Security Services for Java (JSS)
+Version:        %{major}.%{minor}
+Release:        %mkrel 10
+Epoch:                0
+License:        GPL
+Group:                Development/Java
+URL:                http://www.mozilla.org/projects/security/pki/jss/
+Source0:        ftp://ftp.mozilla.org/pub/mozilla.org/security/jss/releases/JSS_3_4_RTM/src/jss-3.4-src.tar.bz2
+Patch0:                jss-3.4-nss-3.11.4.patch
 BuildRequires:  java-devel
 BuildRequires:  java-rpmbuild >= 0:1.5
 # For mozilla-firefox-nss.pc
-BuildRequires:	libnss-devel
-BuildRequires:	nsinstall
+BuildRequires:        libnss-devel
+BuildRequires:        nsinstall
 %if %{gcj_support}
 BuildRequires:    java-gcj-compat-devel
 %endif
-BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
+BuildRoot:        %{_tmppath}/%{name}-%{version}-buildroot
 
 %description
 Network Security Services for Java (JSS) is a Java interface to NSS. It 
@@ -34,8 +31,8 @@ supported by NSS. JSS also provides a pure Java interface for ASN.1
 types and BER/DER encoding.
 
 %package javadoc
-Summary:	Javadoc for %{name}
-Group:		Development/Java
+Summary:        Javadoc for %{name}
+Group:                Development/Java
 
 %description javadoc
 %{summary}.
@@ -57,6 +54,8 @@ fi
 %{__perl} -pi -e 's/^(\s*)JAVA_LIBS/#\1JAVA_LIBS/g' ../coreconf/jdk.mk
 %endif
 
+%{__perl} -pi -e 's/enum([\. \;\)])/enum1\1/g' `%{_bindir}/find . -name '*.java'`
+
 %build
 export CLASSPATH=
 export JAVA_HOME="%{java_home}"
@@ -73,7 +72,7 @@ popd
 %if %{build_free}
 %{__rm} -f org/mozilla/jss/crypto/{KeyGenAlgorithm,KeyGenerator,PBEAlgorithm}.java
 %endif
-%{javadoc} -breakiterator -sourcepath . -d ../../dist/jssdoc org.mozilla.jss org.mozilla.jss.asn1 org.mozilla.jss.crypto org.mozilla.jss.pkcs7 org.mozilla.jss.pkcs10 org.mozilla.jss.pkcs11 org.mozilla.jss.pkcs12 org.mozilla.jss.pkix.primitive org.mozilla.jss.pkix.cert org.mozilla.jss.pkix.cmc org.mozilla.jss.pkix.cmmf org.mozilla.jss.pkix.cms org.mozilla.jss.pkix.crmf org.mozilla.jss.provider.java.security org.mozilla.jss.provider.javax.crypto org.mozilla.jss.SecretDecoderRing org.mozilla.jss.ssl org.mozilla.jss.tests org.mozilla.jss.util
+%{javadoc} -breakiterator -sourcepath . -d ../../dist/jssdoc org.mozilla.jss org.mozilla.jss.asn1 org.mozilla.jss.crypto org.mozilla.jss.pkcs7 org.mozilla.jss.pkcs10 org.mozilla.jss.pkcs11 org.mozilla.jss.pkcs12 org.mozilla.jss.pkix.primitive org.mozilla.jss.pkix.cert org.mozilla.jss.pkix.cmc org.mozilla.jss.pkix.cmmf org.mozilla.jss.pkix.cms org.mozilla.jss.pkix.crmf org.mozilla.jss.provider.java.security org.mozilla.jss.provider.javax.crypto org.mozilla.jss.SecretDecoderRing org.mozilla.jss.ssl org.mozilla.jss.tests org.mozilla.jss.util || :
 
 %install
 %{__rm} -rf %{buildroot}
@@ -110,15 +109,6 @@ rm -rf %{buildroot}
 %{clean_gcjdb}
 %endif
 
-%post javadoc
-%{__rm} -f %{_javadocdir}/%{name}
-%{__ln_s} %{name}-%{version} %{_javadocdir}/%{name}
-
-%postun javadoc
-if [ "$1" = "0" ]; then
-    %{__rm} -f %{_javadocdir}/%{name}
-fi
-
 %files
 %defattr(0644,root,root,0755)
 %doc org/mozilla/jss/tests samples
@@ -134,4 +124,3 @@ fi
 %defattr(0644,root,root,0755)
 %{_javadocdir}/%{name}-%{version}
 %ghost %doc %{_javadocdir}/%{name}
-
