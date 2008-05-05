@@ -3,7 +3,7 @@
 
 Name:           jss
 Version:        4.2.5
-Release:        %mkrel 0.0.1
+Release:        %mkrel 0.0.2
 Epoch:          0
 Summary:        Network Security Services for Java (JSS)
 License:        GPLv2+
@@ -76,7 +76,7 @@ popd
 (cd %{buildroot}%{_jnidir} && %{__ln_s} jss%{major}-%{version}.jar jss%{major}.jar)
 
 # jni library
-%{__mkdir_p} %{buildroot}%{_jnidir}
+%{__mkdir_p} %{buildroot}%{_libdir}
 %{__install} -m 755 security/jss/lib/*/libjss%{major}.so %{buildroot}%{_libdir}
 
 # javadoc
