@@ -14,7 +14,7 @@ URL:            http://www.mozilla.org/projects/security/pki/jss/
 # mv mozilla jss-4.2.5
 # tar cvjf jss-4.2.5.tar.bz2 jss-4.2.5
 Source0:        jss-%{version}.tar.bz2
-Patch0:         http://sources.gentoo.org/viewcvs.py/*checkout*/gentoo-x86/dev-java/jss/files/jss-3.4-target_source.patch
+Patch0:         jss-4.2.5-target_source.patch
 Patch1:         http://sources.gentoo.org/viewcvs.py/*checkout*/gentoo-x86/dev-java/jss/files/jss-4.2.5-use_pkg-config.patch
 Patch2:         jss-4.2.5-jss-html.patch
 BuildRequires:  java-rpmbuild
@@ -40,7 +40,7 @@ Group:          Development/Java
 
 %prep
 %setup -q
-%patch0 -p2
+%patch0 -p1
 %patch1 -p1
 %patch2 -p1
 
