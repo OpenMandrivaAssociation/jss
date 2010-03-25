@@ -3,7 +3,7 @@
 
 Name:           jss
 Version:        4.2.5
-Release:        %mkrel 3.0.4
+Release:        %mkrel 3.0.5
 Epoch:          0
 Summary:        Network Security Services for Java (JSS)
 License:        GPLv2+
