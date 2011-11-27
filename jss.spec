@@ -1,6 +1,6 @@
 Name:           jss
 Version:        4.2.6
-Release:        17
+Release:        19
 Summary:        Java Security Services (JSS)
 
 Group:          System/Libraries
