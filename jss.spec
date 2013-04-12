@@ -1,4 +1,4 @@
-%define gcj_support  1
+%define gcj_support  0
 %define major        4
 
 Name:           jss
@@ -56,6 +56,10 @@ export JAVA_GENTOO_OPTS="-target 1.5 -source 1.5"
 %ifarch x86_64 ppc64
 export USE_64=1
 %endif
+
+cp -p mozilla/security/coreconf/Linux3.2.mk mozilla/security/coreconf/Linux3.6.mk
+sed -i -e 's;LINUX3_1;LINUX3_6;' mozilla/security/coreconf/Linux3.6.mk
+
 pushd security/coreconf
 %{__make} -j1 BUILD_OPT=1 CC="gcc %{optflags}"
 popd
