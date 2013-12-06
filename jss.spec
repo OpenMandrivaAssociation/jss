@@ -4,7 +4,7 @@
 Summary:	Network Security Services for Java (JSS)
 Name:		jss
 Version:	4.2.6
-Release:	3
+Release:	4
 License:	GPLv2+
 Group:		Development/Java
 Url:		http://www.mozilla.org/projects/security/pki/jss/
