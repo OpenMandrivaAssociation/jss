@@ -1,19 +1,27 @@
-%define gcj_support  0
-%define major        4
+%{?_javapackages_macros:%_javapackages_macros}
+Name:           jss
+Version:        4.2.6
+Release:        31.0%{?dist}
+Summary:        Java Security Services (JSS)
 
-Summary:	Network Security Services for Java (JSS)
-Name:		jss
-Version:	4.2.6
-Release:	5
-License:	GPLv2+
-Group:		Development/Java
-Url:		http://www.mozilla.org/projects/security/pki/jss/
-# cvs -z3 -d:pserver:anonymous@cvs-mirror.mozilla.org:/cvsroot export -rJSS_4_2_5_RTM mozilla/security/coreconf
-# cvs -z3 -d:pserver:anonymous@cvs-mirror.mozilla.org:/cvsroot export -rJSS_4_2_5_RTM mozilla/security/jss
-# mv mozilla jss-4.2.5
-# tar cvjf jss-4.2.5.tar.bz2 jss-4.2.5
-Source0:	jss-%{version}.tar.gz
-Source100:	jss.rpmlintrc
+
+License:        MPLv1.1 or GPLv2+ or LGPLv2+
+URL:            http://www.mozilla.org/projects/security/pki/jss/
+# The source for this package was pulled from upstream's cvs. Use the
+# following commands to generate the tarball:
+# cvs -d :pserver:anonymous@cvs-mirror.mozilla.org:/cvsroot export -r JSS_4_2_6_RTM -d jss-4.2.6 -N mozilla/security/coreconf mozilla/security/jss
+# tar -czvf jss-4.2.6.tar.gz jss-4.2.6
+Source0:        http://pki.fedoraproject.org/pki/sources/%{name}/%{name}-%{version}-%{release}/%{name}-%{version}.tar.gz
+Source1:        http://pki.fedoraproject.org/pki/sources/%{name}/%{name}-%{version}-%{release}/MPL-1.1.txt
+Source2:        http://pki.fedoraproject.org/pki/sources/%{name}/%{name}-%{version}-%{release}/gpl.txt
+Source3:        http://pki.fedoraproject.org/pki/sources/%{name}/%{name}-%{version}-%{release}/lgpl.txt
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+BuildRequires:  nss-devel >= 3.12.3.99
+BuildRequires:  nspr-devel >= 4.6.99
+BuildRequires:  java-devel
+Requires:       java
+Requires:       nss >= 3.12.3.99
 
 Patch1:         jss-key_pair_usage_with_op_flags.patch
 Patch2:         jss-javadocs-param.patch
@@ -39,29 +47,45 @@ Patch21:        jss-undo-JCA-deprecations.patch
 Patch22:        jss-undo-BadPaddingException-deprecation.patch
 Patch23:        jss-fixed-build-issue-on-F17-or-newer.patch
 
-BuildRequires:	java-rpmbuild
-BuildRequires:	nspr-devel
-BuildRequires:	nss-devel
-%if %{gcj_support}
-BuildRequires:	java-gcj-compat-devel
-%endif
 
 %description
-Network Security Services for Java (JSS) is a Java interface to NSS. It 
-supports most of the security standards and encryption technologies 
-supported by NSS. JSS also provides a pure Java interface for ASN.1 
-types and BER/DER encoding.
+Java Security Services (JSS) is a java native interface which provides a bridge
+for java-based applications to use native Network Security Services (NSS).
+This only works with gcj. Other JREs require that JCE providers be signed.
 
 %package javadoc
-Summary:	Javadoc for %{name}
-Group:		Development/Java
+Summary:        Java Security Services (JSS) Javadocs
+
+Requires:       jss = %{version}-%{release}
 
 %description javadoc
-%{summary}.
+This package contains the API documentation for JSS.
 
 %prep
 %setup -q
-%apply_patches
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+#%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch14 -p1
+%patch15 -p1
+%patch16 -p1
+%patch17 -p1
+%patch18 -p1
+%patch19 -p1
+%patch20 -p1
+%patch21 -p1
+%patch22 -p1
+%patch23 -p1
 
 %build
 [ -z "$JAVA_HOME" ] && export JAVA_HOME=%{_jvmdir}/java
@@ -71,7 +95,7 @@ BUILD_OPT=1
 export BUILD_OPT
 
 # Generate symbolic info for debuggers
-XCFLAGS="-g %optflags"
+XCFLAGS="-g $RPM_OPT_FLAGS"
 export XCFLAGS
 
 PKG_CONFIG_ALLOW_SYSTEM_LIBS=1
@@ -91,11 +115,12 @@ export NSPR_LIB_DIR
 export NSS_INCLUDE_DIR
 export NSS_LIB_DIR
 
-%ifarch x86_64 ppc64 ia64 s390x sparc64 aarch64
+%ifarch x86_64 ppc64 ia64 s390x sparc64
 USE_64=1
 export USE_64
 %endif
 
+#$if 0${?fedora} >= 16
 cp -p mozilla/security/coreconf/Linux2.6.mk mozilla/security/coreconf/Linux3.1.mk 
 sed -i -e 's;LINUX2_1;LINUX3_1;' mozilla/security/coreconf/Linux3.1.mk
 
@@ -104,6 +129,7 @@ sed -i -e 's;LINUX3_1;LINUX3_2;' mozilla/security/coreconf/Linux3.2.mk
 
 cp -p mozilla/security/coreconf/Linux3.2.mk mozilla/security/coreconf/Linux3.6.mk
 sed -i -e 's;LINUX3_1;LINUX3_6;' mozilla/security/coreconf/Linux3.6.mk
+#$endif
 
 # The Makefile is not thread-safe
 make -C mozilla/security/coreconf
@@ -111,53 +137,227 @@ make -C mozilla/security/jss
 make -C mozilla/security/jss javadoc
 
 %install
-rm -rf %{buildroot} docdir
+rm -rf $RPM_BUILD_ROOT docdir
+
+# Copy the license files here so we can include them in %doc
+cp -p %{SOURCE1} .
+cp -p %{SOURCE2} .
+cp -p %{SOURCE3} .
 
 # There is no install target so we'll do it by hand
 
 # jars
-install -d -m 0755 %{buildroot}%{_jnidir}
-install -m 644 mozilla/dist/xpclass.jar %{buildroot}%{_jnidir}/jss4.jar
-install -d -m 0755 %{buildroot}%{_libdir}/jss
-install -m 644 mozilla/dist/xpclass.jar %{buildroot}%{_libdir}/jss/jss4-%{version}.jar
-ln -fs jss4-%{version}.jar %{buildroot}%{_libdir}/jss/jss4.jar
+#$if 0${?fedora} >= 16
+install -d -m 0755 $RPM_BUILD_ROOT%{_jnidir}
+install -m 644 mozilla/dist/xpclass.jar ${RPM_BUILD_ROOT}%{_jnidir}/jss4.jar
+%else
+install -d -m 0755 $RPM_BUILD_ROOT%{_libdir}/jss
+install -m 644 mozilla/dist/xpclass.jar ${RPM_BUILD_ROOT}%{_libdir}/jss/jss4-%{version}.jar
+ln -fs jss4-%{version}.jar $RPM_BUILD_ROOT%{_libdir}/jss/jss4.jar
 
-install -d -m 0755 %{buildroot}%{_jnidir}
-ln -fs %{_libdir}/jss/jss4.jar %{buildroot}%{_jnidir}/jss4.jar
+install -d -m 0755 $RPM_BUILD_ROOT%{_jnidir}
+ln -fs %{_libdir}/jss/jss4.jar $RPM_BUILD_ROOT%{_jnidir}/jss4.jar
+#$endif
 
 # We have to use the name libjss4.so because this is dynamically
 # loaded by the jar file.
-install -d -m 0755 %{buildroot}%{_libdir}/jss
-install -m 0755 mozilla/dist/Linux*.OBJ/lib/libjss4.so %{buildroot}%{_libdir}/jss/
-pushd  %{buildroot}%{_libdir}/jss
+install -d -m 0755 $RPM_BUILD_ROOT%{_libdir}/jss
+install -m 0755 mozilla/dist/Linux*.OBJ/lib/libjss4.so ${RPM_BUILD_ROOT}%{_libdir}/jss/
+#$if 0${?fedora} >= 16
+pushd  ${RPM_BUILD_ROOT}%{_libdir}/jss
     ln -fs %{_jnidir}/jss4.jar jss4.jar
 popd
+#$endif
 
 # javadoc
-install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}-%{version}
-cp -rp mozilla/dist/jssdoc/* %{buildroot}%{_javadocdir}/%{name}-%{version}
+install -d -m 0755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+cp -rp mozilla/dist/jssdoc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
 
-%if %{gcj_support}
-%{_bindir}/aot-compile-rpm
-%endif
+%clean
+rm -rf $RPM_BUILD_ROOT
 
-%if %{gcj_support}
-%post
-%update_gcjdb
-
-%postun
-%clean_gcjdb
-%endif
-
+# No ldconfig is required since this library is loaded by Java itself.
 %files
-%doc mozilla/security/jss/jss.html
+%defattr(-,root,root,-)
+%doc mozilla/security/jss/jss.html MPL-1.1.txt gpl.txt lgpl.txt
 %{_libdir}/jss/*
 %{_jnidir}/*
-%if %{gcj_support}
-%dir  %{_libdir}/gcj/%{name}
-%attr(-,root,root) %{_libdir}/gcj/%{name}/*
-%endif
 
 %files javadoc
+%defattr(-,root,root,-)
 %dir %{_javadocdir}/%{name}-%{version}
 %{_javadocdir}/%{name}-%{version}/*
+
+
+%changelog
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.6-31
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Wed Jul 17 2013 Nathan Kinder <nkinder@redhat.com> - 4.2.6-30
+- Bugzilla Bug #847120 - Unable to build JSS on F17 or newer
+
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.6-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Wed Dec 19 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 4.2.6-28
+- revbump after jnidir change
+
+* Wed Dec 12 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 4.2.6-27
+- Simple rebuild
+
+* Mon Nov 19 2012 Christina Fu <cfu@redhat.com> - 4.2.6-26
+- added source URLs in spec file to pass Package Wrangler
+
+* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.6-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Fri Mar 30 2012 Matthew Harmsen <mharmsen@redhat.com> - 4.2.6-24
+- Bugzilla Bug #783007 - Un-deprecate previously deprecated methods in
+  JSS 4.2.6 . . . BadPaddingException (mharmsen)
+
+* Tue Mar 20 2012 Christina Fu <cfu@redhat.com> - 4.2.6-23
+- Bugzilla Bug #797351 - JSS - HSM token name was mistaken for manufacturer
+  identifier (cfu)
+- Bugzilla Bug #804840 - [RFE] ECC encryption keys cannot be archived
+  ECC phase2 work - support for ECC encryption key archival and recovery (cfu)
+- Bugzilla Bug #783007 - Un-deprecate previously deprecated methods in
+  JSS 4.2.6 . . . (mharmsen)
+- Dogtag TRAC Task #109 (https://fedorahosted.org/pki/ticket/109) - add
+  benign JNI jar file symbolic link from JNI libdir to JNI jar file (mharmsen)
+
+* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.6-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Wed Oct 19 2011 Christina Fu <cfu@redhat.com> - 4.2.6-21
+- Bugzilla Bug #737122 - DRM: during archiving and recovering, wrapping
+  unwrapping keys should be done in the token
+- support for PKCS5v2; support for secure PKCS12
+- Bugzilla Bug #744797 - KRA key recovery (retrieve pkcs#12) fails after the
+  in-place upgrade( CS 8.0->8.1)
+
+* Mon Sep 19 2011 Matthew Harmsen <mharmsen@redhat.com> - 4.2.6-20
+- Bugzilla Bug #715621 - Defects revealed by Coverity scan
+
+* Wed Aug 31 2011 Matthew Harmsen <mharmsen@redhat.com> - 4.2.6-19.1
+- Bugzilla Bug #734590 - Refactor JNI libraries for Fedora 16+ . . .
+
+* Mon Aug 15 2011 Christina Fu <cfu@redhat.com> - 4.2.6-19
+- Bugzilla Bug 733550 - DRM failed to recovery keys when in FIPS mode
+  (HSM + NSS)
+
+* Fri Aug 12 2011 Matthew Harmsen <mharmsen@redhat.com> - 4.2.6-18
+- Bugzilla Bug #660436 - Warnings should be cleaned up in JSS build
+  (jdennis, mharmsen)
+
+* Wed May 18 2011 Christina Fu <cfu@redhat.com> - 4.2.6-17
+- Bug 670980 - Cannot create system certs when using LunaSA HSM in FIPS Mode
+  and ECC algorithms (support tokens that don't do ECDH)
+
+* Fri Apr 08 2011 Jack Magne <jmagne@redhat.com> - 4.2.6-15.99
+- bug 694661 - TKS instance crash during token enrollment.
+  Back out of previous patch for #676083.
+
+* Thu Feb 24 2011 Andrew Wnuk <awnuk@redhat.com> - 4.2.6-15
+- bug 676083 - JSS: slots not freed 
+
+* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.6-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Mon Jan 31 2011 John Dennis <jdennis@redhat.com> - 4.2.6-13
+- remove misleading comment in spec file concerning jar signing
+
+* Tue Jan 11 2011 Kevin Wright <kwright@redhat.com> - 4.2.6-12
+- added missing patch line
+
+* Tue Dec 21 2010 Christina Fu <cfu@redhat.com> - 4.2.6-11
+- bug 654657 - <jdennis@redhat.com>
+  Incorrect socket accept error message due to bad pointer arithmetic
+- bug 661142 - <cfu@redhat.com>
+  Verification should fail when a revoked certificate is added
+
+* Thu Dec 16 2010 John Dennis <jdennis@redhat.com> - 4.2.6-10
+- Resolves: bug 656094 - <jdennis@redhat.com>
+  Rebase jss to at least jss-4.2.6-9
+- <jdennis@redhat.com>
+  merge in updates from Fedora
+  move jar location to %%{_libdir}/jss and provide symlinks, on 32bit looks like this:
+    /usr/lib/java/jss4.jar -> /usr/lib/jss/jss4.jar
+    /usr/lib/jss/jss4-<version>.jar
+    /usr/lib/jss/jss4.jar -> jss4-<version>.jar
+    /usr/lib/jss/libjss4.so
+- bug 654657 - <jdennis@redhat.com>
+  Incorrect socket accept error message due to bad pointer arithmetic
+- bug 647364 - <cfu@redhat.com>
+  Expose updated certificate verification function in JSS
+- bug 529945 - <cfu@redhat.com>
+  expose NSS calls for OCSP settings
+- bug 638833 - <cfu@redhat.com>
+  rfe ecc - add ec curve name support in JSS and CS
+- <rcritten@redhat.com>
+  Need to explicitly catch UnsatisfiedLinkError exception for System.load()
+- bug 533304 - <rcritten@redhat.com>
+  Move location of libjss4.so to subdirectory and use System.load() to
+  load it instead of System.loadLibrary() for Fedora packaging compliance
+
+* Mon Nov 30 2009 Dennis Gregorovic <dgregor@redhat.com> - 4.2.6-4.1
+- Rebuilt for RHEL 6
+
+* Fri Jul 31 2009 Rob Crittenden <rcritten@redhat.com> 4.2.6-4
+- Resolves: bug 224688 - <cfu@redhat.com>
+  Support ECC POP on the server
+- Resolves: bug 469456 - <jmagne@redhat.com>
+  Server Sockets are hard coded to IPV4
+- Resolves: bug 509183 - <mharmsen@redhat.com>
+  Set NSS dependency >= 3.12.3.99
+
+* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
+* Fri Jun  5 2009 Rob Crittenden <rcritten@redhat.com> 4.2.6-2
+- Include patch to fix missing @param so javadocs will build
+
+* Fri Jun  5 2009 Rob Crittenden <rcritten@redhat.com> 4.2.6-1
+- Resolves: bug 455305 - <cfu@redhat.com>
+  CA ECC Signing Key Failure
+- Resolves: bug 502111 - <cfu@redhat.com>
+  Need JSS interface for NSS's PK11_GenerateKeyPairWithOpFlags() function
+- Resolves: bug 503809 - <mharmsen@redhat.com>
+  Update JSS version to 4.2.6
+- Resolves: bug 503817 - <mharmsen@redhat.com>
+  Create JSS Javadocs as their own RPM
+
+* Wed Feb 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+ 
+* Tue Aug  5 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 4.2.5-3
+- fix license tag
+
+* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 4.2.5-2
+- Autorebuild for GCC 4.3
+
+* Fri Aug  3 2007 Rob Crittenden <rcritten@redhat.com> 4.2.5-1
+- update to 4.2.5
+
+* Thu May 24 2007 Rob Crittenden <rcritten@redhat.com> 4.2.4-6
+- Use _jnidir macro instead of _javadir for the jar files. This will break
+  multilib installs but adheres to the jpackage spec.
+
+* Wed May 16 2007 Rob Crittenden <rcritten@redhat.com> 4.2.4-5
+- Include the 3 license files
+- Remove Requires for nss and nspr. These libraries have versioned symbols
+  so BuildRequires is enough to set the minimum.
+- Add sparc64 for the 64-bit list
+
+* Mon May 14 2007 Rob Crittenden <rcritten@redhat.com> 4.2.4-4
+- Included additional comments on jar signing and why ldconfig is not
+  required.
+
+* Thu May 10 2007 Rob Crittenden <rcritten@redhat.com> 4.2.4-3
+- Added information on how to pull the source into a tar.gz
+
+* Thu Mar 15 2007  Rob Crittenden <rcritten@redhat.com> 4.2.4-2
+- Added RPM_OPT_FLAGS to XCFLAGS
+- Added link to Sun JCE information
+
+* Tue Feb 27 2007 Rob Crittenden <rcritten@redhat.com> 4.2.4-1
+- Initial build
