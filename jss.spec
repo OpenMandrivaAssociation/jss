@@ -1,4 +1,6 @@
 %{?_javapackages_macros:%_javapackages_macros}
+# avoid too much patching
+%define fedora 20
 Name:           jss
 Version:        4.2.6
 Release:        31.0%{?dist}
@@ -73,7 +75,7 @@ This package contains the API documentation for JSS.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
-#$patch11 -p1
+#%patch11 -p1
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
@@ -120,7 +122,7 @@ USE_64=1
 export USE_64
 %endif
 
-#$if 0${?fedora} >= 16
+%if 0%{?fedora} >= 16
 cp -p mozilla/security/coreconf/Linux2.6.mk mozilla/security/coreconf/Linux3.1.mk 
 sed -i -e 's;LINUX2_1;LINUX3_1;' mozilla/security/coreconf/Linux3.1.mk
 
@@ -129,7 +131,7 @@ sed -i -e 's;LINUX3_1;LINUX3_2;' mozilla/security/coreconf/Linux3.2.mk
 
 cp -p mozilla/security/coreconf/Linux3.2.mk mozilla/security/coreconf/Linux3.6.mk
 sed -i -e 's;LINUX3_1;LINUX3_6;' mozilla/security/coreconf/Linux3.6.mk
-#$endif
+%endif
 
 # The Makefile is not thread-safe
 make -C mozilla/security/coreconf
@@ -147,7 +149,7 @@ cp -p %{SOURCE3} .
 # There is no install target so we'll do it by hand
 
 # jars
-#$if 0${?fedora} >= 16
+%if 0%{?fedora} >= 16
 install -d -m 0755 $RPM_BUILD_ROOT%{_jnidir}
 install -m 644 mozilla/dist/xpclass.jar ${RPM_BUILD_ROOT}%{_jnidir}/jss4.jar
 %else
@@ -157,21 +159,24 @@ ln -fs jss4-%{version}.jar $RPM_BUILD_ROOT%{_libdir}/jss/jss4.jar
 
 install -d -m 0755 $RPM_BUILD_ROOT%{_jnidir}
 ln -fs %{_libdir}/jss/jss4.jar $RPM_BUILD_ROOT%{_jnidir}/jss4.jar
-#$endif
+%endif
 
 # We have to use the name libjss4.so because this is dynamically
 # loaded by the jar file.
 install -d -m 0755 $RPM_BUILD_ROOT%{_libdir}/jss
 install -m 0755 mozilla/dist/Linux*.OBJ/lib/libjss4.so ${RPM_BUILD_ROOT}%{_libdir}/jss/
-#$if 0${?fedora} >= 16
+%if 0%{?fedora} >= 16
 pushd  ${RPM_BUILD_ROOT}%{_libdir}/jss
     ln -fs %{_jnidir}/jss4.jar jss4.jar
 popd
-#$endif
+%endif
 
 # javadoc
 install -d -m 0755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
 cp -rp mozilla/dist/jssdoc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+
+%clean
+rm -rf $RPM_BUILD_ROOT
 
 # No ldconfig is required since this library is loaded by Java itself.
 %files
