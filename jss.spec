@@ -73,7 +73,7 @@ This package contains the API documentation for JSS.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
-#%patch11 -p1
+#$patch11 -p1
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
@@ -172,9 +172,6 @@ popd
 # javadoc
 install -d -m 0755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
 cp -rp mozilla/dist/jssdoc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 # No ldconfig is required since this library is loaded by Java itself.
 %files
