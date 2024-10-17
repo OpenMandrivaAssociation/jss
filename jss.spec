@@ -8,7 +8,7 @@ Summary:        Java Security Services (JSS)
 
 
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
-URL:            http://www.mozilla.org/projects/security/pki/jss/
+URL:            https://www.mozilla.org/projects/security/pki/jss/
 # The source for this package was pulled from upstream's cvs. Use the
 # following commands to generate the tarball:
 # cvs -d :pserver:anonymous@cvs-mirror.mozilla.org:/cvsroot export -r JSS_4_2_6_RTM -d jss-4.2.6 -N mozilla/security/coreconf mozilla/security/jss
