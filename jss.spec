@@ -19,6 +19,7 @@ Source2:        http://pki.fedoraproject.org/pki/sources/%{name}/%{name}-%{versi
 Source3:        http://pki.fedoraproject.org/pki/sources/%{name}/%{name}-%{version}-%{release}/lgpl.txt
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+BuildRequires:	make
 BuildRequires:  nss-devel >= 3.12.3.99
 BuildRequires:  nspr-devel >= 4.6.99
 BuildRequires:  java-devel
